@@ -1,0 +1,6 @@
+---
+title: "Treball aliments"
+author: "JV"
+date: "29/12/2022"
+output: html_document
+---
