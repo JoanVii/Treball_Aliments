@@ -4,3 +4,81 @@ author: "JV"
 date: "29/12/2022"
 output: html_document
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+directori <- getwd()
+
+library(readxl)
+library(tidyverse)
+```
+
+# Pràctica 1:
+
+
+```{r processament dades pràctica 1}
+
+
+practica_4 <- read_excel(paste0(directori, "/Ignorar/Practica 4.xlsx"))
+#practica_4_proc <- practica_4 %>% mutate(Humitat = (`0h`-`96h`)/`0h`*100)
+#practica_4_proc <- practica_4_proc %>%group_by(Muestra) %>% mutate(M=mean(Humitat)) %>% mutate(SEM=sd(Humitat))
+
+```
+
+## Including Plots
+
+
+
+```{r gràfic pràctica 1}
+#practica_4_proc<-practica_4_proc %>% select(Muestra,M,SEM)
+#plot <- practica_4_proc[!duplicated(practica_4_proc$Muestra),]
+
+p <- ggplot(practica_4, aes(`Embutit`, `Mitjana`, fill=`Embutit`))
+
+p <- p + geom_bar(stat='identity') + geom_errorbar( aes(x=`Embutit`, ymin=`Mitjana` - `Error`, ymax= `Mitjana` + `Error`), width=0.1, colour="black", alpha=1, size=0.3) + labs (x = "Embutit", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
+
+p <- p + scale_fill_brewer(palette = "Dark2")
+p
+```
+
+El shapiro test ens permet contrastar la normalitat d'un conjunt de dades. Així, la hipòtesi nul·la que es planteja és que les mostres segueixen una distribució normal (ho he cercat wiki però es pot contrastar)
+
+```{r Shafiro test}
+shapiro.test(practica_4$Contingut)
+```
+
+
+
+
+```{r ANOVA}
+one.way <- aov(`Contingut` ~ `Embutit`, data = practica_4)
+
+summary(one.way)
+
+```
+
+Com que dona significatiu ens podem plantejar quins són els formatges que tenen un percentatge d'humitat significativament diferent:
+```{r}
+pwc <- pairwise.t.test(practica_4$Contingut, practica_4$`Embutit`, paired = FALSE,
+    p.adjust.method = "bonferroni")
+pwc
+```
+
+
+
+```{r Kruskal test}
+kt <- kruskal.test(`Contingut` ~ `Embutit`, data = practica_4)
+kt
+```
+
+
+
+
+
+
+```{r post-hoc}
+pwc2 <- pairwise.wilcox.test(practica_4$Contingut, practica_4$`Embutit`, paired = FALSE,
+    p.adjust.method = "holm")
+pwc2
+```
