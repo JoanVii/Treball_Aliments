@@ -16,7 +16,6 @@ library(tidyverse)
 
 # Pràctica 1:
 
-
 ```{r processament dades pràctica 1}
 
 
@@ -26,9 +25,7 @@ practica_4 <- read_excel(paste0(directori, "/Ignorar/Practica 4.xlsx"))
 
 ```
 
-## Including Plots
-
-
+## Grafics Pràctica 1:
 
 ```{r gràfic pràctica 1}
 #practica_4_proc<-practica_4_proc %>% select(Muestra,M,SEM)
@@ -51,7 +48,7 @@ shapiro.test(practica_4$Contingut)
 
 
 
-```{r ANOVA}
+```{r ANOVA_1}
 one.way <- aov(`Contingut` ~ `Embutit`, data = practica_4)
 
 summary(one.way)
@@ -65,20 +62,193 @@ pwc <- pairwise.t.test(practica_4$Contingut, practica_4$`Embutit`, paired = FALS
 pwc
 ```
 
-
-
 ```{r Kruskal test}
 kt <- kruskal.test(`Contingut` ~ `Embutit`, data = practica_4)
 kt
 ```
 
-
-
-
-
-
-```{r post-hoc}
+```{r post-hoc 2}
 pwc2 <- pairwise.wilcox.test(practica_4$Contingut, practica_4$`Embutit`, paired = FALSE,
     p.adjust.method = "holm")
 pwc2
 ```
+
+
+
+# Practica 2
+
+## Pràctica 3.1.
+
+```{r processament dades pràctica 3.1.}
+practica_31 <- read_excel(paste0(directori, "/Ignorar/Practica 31.xlsx"))
+#practica_2_proc <- practica_2 %>% mutate(Humitat = (`0h`-`96h`)/`0h`*100)
+#practica_2_proc <- practica_2_proc %>%group_by(Muestra) %>% mutate(M=mean(Humitat)) %>% mutate(SEM=sd(Humitat))
+
+```
+
+## Including Plots
+
+```{r gràfic pràctica 3.1.}
+#practica_2_proc<-practica_2_proc %>% select(Muestra,M,SEM)
+#plot <- practica_2_proc[!duplicated(practica_2_proc$Muestra),]
+
+p_31 <- ggplot(practica_31, aes(`Formatge`, `Mitjana`, fill=`Formatge`))
+
+p_31 <- p_31 + geom_bar(stat='identity') + geom_errorbar( aes(x=`Formatge`, ymin=`Mitjana` - `Error`, ymax= `Mitjana` + `Error`), width=0.1, colour="black", alpha=1, size=0.3) + labs (x = "Tipus de formatge", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
+
+p_31 <- p_31 + scale_fill_brewer(palette = "Dark2")
+p_31
+```
+
+El shapiro test ens permet contrastar la normalitat d'un conjunt de dades. Així, la hipòtesi nul·la que es planteja és que les mostres segueixen una distribució normal (ho he cercat wiki però es pot contrastar)
+
+```{r Shafiro test 3.1}
+shapiro.test(practica_31$Contingut)
+```
+
+```{r ANOVA}
+one.way <- aov(`Contingut` ~ `Formatge`, data = practica_31)
+
+summary(one.way)
+
+```
+
+Com que dona significatiu ens podem plantejar quins són els formatges que tenen un percentatge d'humitat significativament diferent:
+```{r}
+pwc_31 <- pairwise.t.test(practica_31$Contingut, practica_31$`Formatge`, paired = FALSE,
+    p.adjust.method = "bonferroni")
+pwc_31
+```
+
+```{r Kruskal test 3.1}
+kt_31 <- kruskal.test(`Contingut` ~ `Formatge`, data = practica_31)
+kt_31
+```
+
+
+```{r post-hoc}
+pwc2_31 <- pairwise.wilcox.test(practica_31$Contingut, practica_31$`Formatge`, paired = FALSE,
+    p.adjust.method = "holm")
+pwc2_31
+```
+
+#Pràctica 3.2
+
+```{r processament dades pràctica 32}
+
+
+practica_32 <- read_excel(paste0(directori, "/Ignorar/Practica 32.xlsx"))
+#practica_2_proc <- practica_2 %>% mutate(Humitat = (`0h`-`96h`)/`0h`*100)
+#practica_2_proc <- practica_2_proc %>%group_by(Muestra) %>% mutate(M=mean(Humitat)) %>% mutate(SEM=sd(Humitat))
+
+```
+
+## Including Plots
+
+```{r gràfic pràctica 22}
+#practica_2_proc<-practica_2_proc %>% select(Muestra,M,SEM)
+#plot <- practica_2_proc[!duplicated(practica_2_proc$Muestra),]
+
+p2 <- ggplot(practica_32, aes(`Tipus de mostra`, `Mitjana`, fill=`Tipus de mostra`))
+
+p2 <- p2 + geom_bar(stat='identity') + geom_errorbar( aes(x=`Tipus de mostra`, ymin=`Mitjana` - `Error`, ymax= `Mitjana` + `Error`), width=0.1, colour="black", alpha=1, size=0.3) + labs (x = "Tipus de Mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
+
+p2 <- p2 + scale_fill_brewer(palette = "Dark2")
+p2
+```
+
+El shapiro test ens permet contrastar la normalitat d'un conjunt de dades. Així, la hipòtesi nul·la que es planteja és que les mostres segueixen una distribució normal (ho he cercat wiki però es pot contrastar)
+
+```{r Shafiro test 32}
+shapiro.test(practica_32$Contingut)
+```
+
+```{r ANOVA 22}
+one.way32 <- aov(`Contingut` ~ `Tipus de mostra`, data = practica_32)
+
+summary(one.way32)
+
+```
+
+Com que dona significatiu ens podem plantejar quins són els formatges que tenen un percentatge d'humitat significativament diferent:
+
+```{r}
+pwc_32 <- pairwise.t.test(practica_32$Contingut, practica_32$`Tipus de mostra`, paired = FALSE,
+    p.adjust.method = "bonferroni")
+pwc_32
+```
+
+```{r Kruskal test 22}
+kt_32 <- kruskal.test(`Contingut` ~ `Tipus de mostra`, data = practica_32)
+kt_32
+```
+
+
+```{r post-hoc 22}
+pwc2_32 <- pairwise.wilcox.test(practica_32$Contingut, practica_32$`Tipus de mostra`, paired = FALSE,
+    p.adjust.method = "holm")
+pwc2_32
+```
+
+#Pràctica 3.3.
+
+```{r processament dades pràctica 33}
+
+
+practica33 <- read_excel(paste0(directori, "/Ignorar/Practica 33.xlsx"))
+#practica_2_proc <- practica_2 %>% mutate(Humitat = (`0h`-`96h`)/`0h`*100)
+#practica_2_proc <- practica_2_proc %>%group_by(Muestra) %>% mutate(M=mean(Humitat)) %>% mutate(SEM=sd(Humitat))
+
+```
+
+## Including Plots
+
+```{r gràfic pràctica 33}
+#practica_2_proc<-practica_2_proc %>% select(Muestra,M,SEM)
+#plot <- practica_2_proc[!duplicated(practica_2_proc$Muestra),]
+
+p3 <- ggplot(practica33, aes(`Formatge`, `Mitjana`, fill=`Formatge`))
+
+p3 <- p3 + geom_bar(stat='identity') + geom_errorbar( aes(x=`Formatge`, ymin=`Mitjana` - `Error`, ymax= `Mitjana` + `Error`), width=0.1, colour="black", alpha=1, size=0.3) + labs (x = "Tipus de Mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
+
+p3 <- p3 + scale_fill_brewer(palette = "Dark2")
+p3
+```
+
+El shapiro test ens permet contrastar la normalitat d'un conjunt de dades. Així, la hipòtesi nul·la que es planteja és que les mostres segueixen una distribució normal (ho he cercat wiki però es pot contrastar)
+
+```{r Shafiro test 33}
+shapiro.test(practica33$Contingut)
+```
+
+
+```{r ANOVA 33}
+one.way33 <- aov(`Contingut` ~ `Formatge`, data = practica33)
+
+summary(one.way33)
+
+```
+
+Com que dona significatiu ens podem plantejar quins són els formatges que tenen un percentatge d'humitat significativament diferent:
+```{r}
+pwc_33 <- pairwise.t.test(practica33$Contingut, practica33$`Formatge`, paired = FALSE,
+    p.adjust.method = "bonferroni")
+pwc_33
+```
+
+```{r Kruskal test 33}
+kt_33 <- kruskal.test(`Contingut` ~ `Formatge`, data = practica33)
+kt_33
+```
+
+
+```{r post-hoc 33}
+pwc2_33 <- pairwise.wilcox.test(practica33$Contingut, practica33$`Formatge`, paired = FALSE,
+    p.adjust.method = "holm")
+pwc2_33
+```
+
+
+
+
+# Practica 3
