@@ -16,6 +16,7 @@ library(readxl)
 library(tidyverse)
 
 
+
 # lectura de dades:
 practica_1 <- read_excel(paste0(directori, "/Ignorar/Practica 1.xlsx"))
 practica_21 <- read_excel(paste0(directori, "/Ignorar/Practica 21.xlsx"))
