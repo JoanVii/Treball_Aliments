@@ -2,7 +2,9 @@
 title: "Treball aliments"
 author: "JV"
 date: "29/12/2022"
-output: html_document
+output:
+  html_document:
+    toc: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -25,296 +27,330 @@ practica_4 <- read_excel(paste0(directori, "/Ignorar/Practica 4.xlsx"))
 
 ```
 
+# Preàmbul
+
+***Abans de res, revisar que els titols i els noms dels eixos siguin els correctes!***
+
+L'objectiu d'aquestes pràctiques és determinar les diferències entre les propietats de certs eliments -per exemple, el % d'humitat.
+
+S'apliquen els seguents test:
+
+-   [Shapiro--Wilk](https://es.wikipedia.org/wiki/Prueba_de_Shapiro%E2%80%93Wilk#:~:text=En%20estad%C3%ADstica%2C%20la%20prueba%20de%20Shapiro%E2%80%93Wilk%20se%20usa,pruebas%20m%C3%A1s%20potentes%20para%20el%20contraste%20de%20normalidad.): "En estadística, la prueba de Shapiro--Wilk se usa para contrastar la normalidad de un conjunto de datos. Se plantea como hipótesis nula que una muestra proviene de una población normalmente distribuida. Fue publicado en 1965 por Samuel Shapiro y Martin Wilk. Se considera uno de las pruebas más potentes para el contraste de normalidad."
+
+-   Si suposam normalitat:
+
+    -   [Anova](https://es.wikipedia.org/wiki/An%C3%A1lisis_de_la_varianza): Serveix per estudiar la variança
+
+    -   [T-Student](https://es.wikipedia.org/wiki/Prueba_t_de_Student) + [Bonferroni](https://es.wikipedia.org/wiki/Correcci%C3%B3n_de_Bonferroni):"es cualquier prueba en la que el estadístico utilizado tiene una distribución t de Student si la hipótesis nula es cierta. Se aplica cuando la población estudiada sigue una distribución normal, pero el tamaño muestral es demasiado pequeño como para que el estadístico en el que está basada la inferencia esté normalmente distribuido, utilizándose una estimación de la desviación típica en lugar del valor real" + "La prueba de hipótesis estadística se basa en rechazar la hipótesis nula si la probabilidad de los datos observados en las hipótesis nulas es baja. Si se prueban múltiples hipótesis, aumenta la probabilidad de un evento raro y, por lo tanto, aumenta la probabilidad de rechazar incorrectamente una hipótesis nula (es decir, cometer un error de tipo I.)"
+
+-   Si NO suposam normalitat:
+
+    -   [Kruskal-Wallis](https://es.wikipedia.org/wiki/Prueba_de_Kruskal-Wallis): Com l'ANOVA però no assumeix normalitat
+
+    -   [Wilcoxon](https://es.wikipedia.org/wiki/Prueba_de_los_rangos_con_signo_de_Wilcoxon): "La prueba de los rangos con signo de Wilcoxon es una prueba no paramétrica para comparar el rango medio de dos muestras relacionadas y determinar si existen diferencias entre ellas. Se utiliza como alternativa a la prueba t de Student cuando no se puede suponer la normalidad de dichas muestras."
+
 # Pràctica 1:
 
+## Gràfica
 
-## Grafics Pràctica 1:
+```{r grafic 1, echo=FALSE, warning=FALSE}
 
-```{r gràfic pràctica 1}
-# modificat de paractica 4 a practica 1
+p <- ggplot(practica_1, aes(`Tipus de mostra`, `Mitjana`, fill=`Tipus de mostra`)) +
+  geom_bar(stat='identity') +
+  geom_errorbar(
+    aes(x = `Tipus de mostra`, ymin =`Mitjana` - `Error`, ymax = `Mitjana` + `Error`),
+    width = 0.1, colour = "black",
+    alpha = 1, size = 0.3
+  ) +
+  scale_fill_brewer(palette = "Dark2")
 
-# p <- ggplot(
-#   practica_1,
-#   aes("Tipus de mostra", "Mitjana")
-# )
-# p
-# 
-# p <- p + 
-#   geom_bar(stat='identity') + 
-#   geom_errorbar(
-#      aes(x="Tipus de mostra", ymin="Mitjana" - "Error", ymax= "Mitjana" + "Error"),
-#      width=0.1, colour="black",
-#      alpha=1,
-#      size=0.3) + 
-#   labs (x = "Tipus de mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de # formatge"  )
-# 
-# p <- p + scale_fill_brewer(palette = "Dark2")
-# p
+### Modificar-ho per canviar el titol i tal
+p <- p + labs (x = "Tipus de mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada tipus de mostra")
+### 
+
+p
 ```
 
-El shapiro test ens permet contrastar la normalitat d'un conjunt de dades. Així, la hipòtesi nul·la que es planteja és que les mostres segueixen una distribució normal (ho he cercat wiki però es pot contrastar)
+## Test
 
-```{r test_practica_1}
+```{r test 1}
 data <- practica_1
 colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
 
+# Comporvam normalitat
 shapiro.test(data$Contingut)
 
-# suposam normalitat (si no hi ha normalitat tot i aixi ho feim)
-one.way <- aov(data$Contingut ~ data$Mostra)
-summary(one.way)
+# Si es normal: Anova
+summary(aov(data$Contingut ~ data$Mostra))
 
-pwc <- pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
-pwc
+# Si es normal: t.test
+pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
 
-# suposam NO normalitat
-kt <- kruskal.test(data$Contingut ~ data$Mostra)
-kt
+# Si no es normal: Kruskal test
+kruskal.test(data$Contingut ~ data$Mostra)
 
-pwc2 <- pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
-pwc2
+# Si no es normal: Wilcoxon test
+pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
 ```
 
-
-
-# Practica 2
+# Pràctica 2
 
 ## Pràctica 2.1.
 
+### Gràfic
 
-## Including Plots
+```{r grafic 2.1, echo=FALSE, warning=FALSE}
+p <- ggplot(practica_21, aes(`Tipus de formatge`, `Mitjana`, fill=`Tipus de formatge`)) +
+  geom_bar(stat='identity') +
+  geom_errorbar(
+    aes(x = `Tipus de formatge`, ymin =`Mitjana` - `Error`, ymax = `Mitjana` + `Error`),
+    width = 0.1, colour = "black",
+    alpha = 1, size = 0.3
+  ) +
+  scale_fill_brewer(palette = "Dark2")
 
-```{r gràfic pràctica 2.1.}
-# titol <- 
-#p_21 <- ggplot(
-#  practica_21,
-#  aes("Formatge", "Mitjana", fill="Formatge")
-#)
-#
-#p_31 <- p_21 +
-#  geom_bar(stat='identity') +
-#  geom_errorbar( aes(x="Formatge", ymin="Mitjana" - "Error", ymax= "Mitjana" + "Error"),
-#                 width=0.1, colour="black", alpha=1, size=0.3) +
-#  labs (x = "Tipus de formatge", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
-#
-#p_31 <- p_31 + scale_fill_brewer(palette = "Dark2")
-#p_31
-# save png
+### Modificar-ho per canviar el titol i tal
+p <- p + labs (x = "Tipus de formatge", y = "% Humitat", title = "Percentatge d'humitat en funció de cada tipus de mostra")
+### 
+
+p
 ```
 
-El shapiro test ens permet contrastar la normalitat d'un conjunt de dades. Així, la hipòtesi nul·la que es planteja és que les mostres segueixen una distribució normal (ho he cercat wiki però es pot contrastar)
+### Test
 
-```{r Shafiro test 22_}
+```{r test 2.1}
+data <- practica_21
+colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
+
+# Comporvam normalitat
+shapiro.test(data$Contingut)
+
+# Si es normal: Anova
+summary(aov(data$Contingut ~ data$Mostra))
+
+# Si es normal: t.test
+pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
+
+# Si no es normal: Kruskal test
+kruskal.test(data$Contingut ~ data$Mostra)
+
+# Si no es normal: Wilcoxon test
+pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
+```
+
+## Pràctica 2.2
+
+### Gràfic
+
+```{r grafic 2.2, echo=FALSE, warning=FALSE}
+p <- ggplot(practica_22, aes(`Tipus de formatge`, `Mitjana`, fill=`Tipus de formatge`)) +
+  geom_bar(stat='identity') +
+  geom_errorbar(
+    aes(x = `Tipus de formatge`, ymin =`Mitjana` - `Error`, ymax = `Mitjana` + `Error`),
+    width = 0.1, colour = "black",
+    alpha = 1, size = 0.3
+  ) +
+  scale_fill_brewer(palette = "Dark2")
+
+### Modificar-ho per canviar el titol i tal
+p <- p + labs (x = "Tipus de formatge", y = "% Humitat", title = "Percentatge d'humitat en funció de cada tipus de mostra")
+### 
+
+p
+```
+
+### Test
+
+```{r test 2.2}
 data <- practica_22
 colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
 
+# Comporvam normalitat
 shapiro.test(data$Contingut)
 
-one.way <- aov(data$Contingut ~ data$Mostra)
-summary(one.way)
+# Si es normal: Anova
+summary(aov(data$Contingut ~ data$Mostra))
 
-pwc <- pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
-pwc
+# Si es normal: t.test
+pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
 
-kt <- kruskal.test(data$Contingut ~ data$Mostra)
-kt
+# Si no es normal: Kruskal test
+kruskal.test(data$Contingut ~ data$Mostra)
 
-pwc2 <- pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
-pwc2
+# Si no es normal: Wilcoxon test
+pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
 ```
 
-# Pràctica 2.2
+# Pràctica 3
 
-```{r processament dades pràctica 22}
-practica_32 <- read_excel(paste0(directori, "/Ignorar/Practica 32.xlsx"))
-## !!!
+## Pràctica 3.1
 
+### Gràfic
+
+```{r grafic 3.1, echo=FALSE, warning=FALSE}
+p <- ggplot(practica_31, aes(`Formatge`, `Mitjana`, fill=`Formatge`)) +
+  geom_bar(stat='identity') +
+  geom_errorbar(
+    aes(x = `Formatge`, ymin =`Mitjana` - `Error`, ymax = `Mitjana` + `Error`),
+    width = 0.1, colour = "black",
+    alpha = 1, size = 0.3
+  ) +
+  scale_fill_brewer(palette = "Dark2")
+
+### Modificar-ho per canviar el titol i tal
+p <- p + labs (x = "Formatge", y = "% Humitat", title = "Percentatge d'humitat en funció de cada tipus de mostra")
+### 
+
+p
 ```
 
-## Including Plots
+### Test
 
-```{r gràfic pràctica 22}
-
-p2 <- ggplot(practica_32, aes("Tipus de mostra", "Mitjana", fill="Tipus de mostra"))
-
-#p2 <- p2 + geom_bar(stat='identity') + geom_errorbar( aes(x="Tipus de mostra", ymin="Mitjana" - "Error", ymax= "Mitjana" + "Error"), width=0.1, colour="black", alpha=1, size=0.3) + labs (x = "Tipus de Mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
-
-p2 <- p2 + scale_fill_brewer(palette = "Dark2")
-p2
-```
-
-El shapiro test ens permet contrastar la normalitat d'un conjunt de dades. Així, la hipòtesi nul·la que es planteja és que les mostres segueixen una distribució normal (ho he cercat wiki però es pot contrastar)
-
-```{r Shafiro test 22}
-data <- practica_22
-colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
-
-shapiro.test(data$Contingut)
-
-one.way <- aov(data$Contingut ~ data$Mostra)
-summary(one.way)
-
-pwc <- pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
-pwc
-
-kt <- kruskal.test(data$Contingut ~ data$Mostra)
-kt
-
-pwc2 <- pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
-pwc2
-```
-
-
-# Practica 3
-
-
-## Pràctica 3.1.
-```{r _gràfic pràctica 3.1.}
-
-# p_31 <- ggplot(practica_31, aes("Formatge", "Mitjana", fill="Formatge"))
-# 
-# p_31 <- p_31 +
-#   geom_bar(stat='identity') + 
-#   geom_errorbar( aes(x="Formatge", ymin="Mitjana" - "Error", ymax= "Mitjana" + "Error"), 
-#                  width=0.1, colour="black", alpha=1, size=0.3) + 
-#   labs (x = "Tipus de formatge", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
-# 
-# p_31 <- p_31 + scale_fill_brewer(palette = "Dark2")
-# p_31
-```
-
-```{r _Shafiro test 3.1}
+```{r test 3.1}
 data <- practica_31
 colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
 
+# Comporvam normalitat
 shapiro.test(data$Contingut)
 
-one.way <- aov(data$Contingut ~ data$Mostra)
-summary(one.way)
+# Si es normal: Anova
+summary(aov(data$Contingut ~ data$Mostra))
 
-pwc <- pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
-pwc
+# Si es normal: t.test
+pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
 
-kt <- kruskal.test(data$Contingut ~ data$Mostra)
-kt
+# Si no es normal: Kruskal test
+kruskal.test(data$Contingut ~ data$Mostra)
 
-pwc2 <- pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
-pwc2
+# Si no es normal: Wilcoxon test
+pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
 ```
 
-# Pràctica 3.2
+## Pràctica 3.2
 
-## Including Plots
+### Gràfic
 
-```{r _gràfic pràctica 32}
-#practica_2_proc<-practica_2_proc %>% select(Muestra,M,SEM)
-#plot <- practica_2_proc[!duplicated(practica_2_proc$Muestra),]
+```{r grafic 3.2, echo=FALSE, warning=FALSE}
+p <- ggplot(practica_32, aes(`Tipus de mostra`, `Mitjana`, fill=`Tipus de mostra`)) +
+  geom_bar(stat='identity') +
+  geom_errorbar(
+    aes(x = `Tipus de mostra`, ymin =`Mitjana` - `Error`, ymax = `Mitjana` + `Error`),
+    width = 0.1, colour = "black",
+    alpha = 1, size = 0.3
+  ) +
+  scale_fill_brewer(palette = "Dark2")
 
-# p2 <- ggplot(practica_32, aes("Tipus de mostra", "Mitjana", fill="Tipus de mostra"))
-# 
-# p2 <- p2 + 
-#   geom_bar(stat='identity') + 
-#   geom_errorbar( aes(x="Tipus de mostra", ymin="Mitjana" - "Error", ymax= "Mitjana" + "Error")
-#                  , width=0.1, colour="black", alpha=1, size=0.3) + 
-#   labs (x = "Tipus de Mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
-# 
-# p2 <- p2 + scale_fill_brewer(palette = "Dark2")
-# p2
+### Modificar-ho per canviar el titol i tal
+p <- p + labs (x = "Tipus de mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada tipus de mostra")
+### 
+
+p
 ```
 
-```{r _Shafiro test 32}
+### Test
+
+```{r test 3.2}
 data <- practica_32
 colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
 
+# Comporvam normalitat
 shapiro.test(data$Contingut)
 
-one.way <- aov(data$Contingut ~ data$Mostra)
-summary(one.way)
+# Si es normal: Anova
+summary(aov(data$Contingut ~ data$Mostra))
 
-pwc <- pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
-pwc
+# Si es normal: t.test
+pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
 
-kt <- kruskal.test(data$Contingut ~ data$Mostra)
-kt
+# Si no es normal: Kruskal test
+kruskal.test(data$Contingut ~ data$Mostra)
 
-pwc2 <- pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
-pwc2
+# Si no es normal: Wilcoxon test
+pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
 ```
 
-# Pràctica 3.3.
+## Pràctica 3.3
 
-## Including Plots
+### Gràfic
 
-```{r _gràfic pràctica 33}
-#practica_2_proc<-practica_2_proc %>% select(Muestra,M,SEM)
-#plot <- practica_2_proc[!duplicated(practica_2_proc$Muestra),]
+```{r grafic 3.3, echo=FALSE, warning=FALSE}
+p <- ggplot(practica_33, aes(`Formatge`, `Mitjana`, fill=`Formatge`)) +
+  geom_bar(stat='identity') +
+  geom_errorbar(
+    aes(x = `Formatge`, ymin =`Mitjana` - `Error`, ymax = `Mitjana` + `Error`),
+    width = 0.1, colour = "black",
+    alpha = 1, size = 0.3
+  ) +
+  scale_fill_brewer(palette = "Dark2")
 
-#p3 <- ggplot(practica33, aes("Formatge", "Mitjana", fill="Formatge"))
-#
-#p3 <- p3 + geom_bar(stat='identity') +
-#  geom_errorbar( aes(x="Formatge", ymin="Mitjana" - "Error", ymax= "Mitjana" + "Error"),
-#                 width=0.1, colour="black", alpha=1, size=0.3) + 
-#  labs (x = "Tipus de Mostra", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
-#
-#p3 <- p3 + scale_fill_brewer(palette = "Dark2")
-#p3
+### Modificar-ho per canviar el titol i tal
+p <- p + labs (x = "Formatge", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge")
+### 
+
+p
 ```
 
+### Test
 
-```{r _Shafiro test 33}
+```{r tests 3.3}
 data <- practica_33
 colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
 
+# Comporvam normalitat
 shapiro.test(data$Contingut)
 
-one.way <- aov(data$Contingut ~ data$Mostra)
-summary(one.way)
+# Si es normal: Anova
+summary(aov(data$Contingut ~ data$Mostra))
 
-pwc <- pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
-pwc
+# Si es normal: t.test
+pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
 
-kt <- kruskal.test(data$Contingut ~ data$Mostra)
-kt
+# Si no es normal: Kruskal test
+kruskal.test(data$Contingut ~ data$Mostra)
 
-pwc2 <- pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
-pwc2
+# Si no es normal: Wilcoxon test
+pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
 ```
 
+# Pràctica 4
 
+## Gràfic
 
-# Practica 4
+```{r grafic 4, echo=FALSE, warning=FALSE}
+p <- ggplot(practica_4, aes(`Embutit`, `Mitjana`, fill=`Embutit`)) +
+  geom_bar(stat='identity') +
+  geom_errorbar(
+    aes(x = `Embutit`, ymin =`Mitjana` - `Error`, ymax = `Mitjana` + `Error`),
+    width = 0.1, colour = "black",
+    alpha = 1, size = 0.3
+  ) +
+  scale_fill_brewer(palette = "Dark2")
 
-## Including Plots
+### Modificar-ho per canviar el titol i tal
+p <- p + labs (x = "Embutit", y = "% Humitat", title = "Percentatge d'humitat en funció de cada tipus d'embutit")
+### 
 
-```{r __gràfic pràctica 1}
-# p <- ggplot(practica_4, aes("Embutit", "Mitjana", fill="Embutit"))
-# 
-# p <- p +
-#   geom_bar(stat='identity') +
-#   geom_errorbar( aes(x="Embutit", ymin="Mitjana" - "Error", ymax= "Mitjana" + "Error"),
-#                  width=0.1, colour="black", alpha=1, size=0.3) +
-#   labs (x = "Embutit", y = "% Humitat", title = "Percentatge d'humitat en funció de cada Tipus de formatge"  )
-# 
-# p <- p + scale_fill_brewer(palette = "Dark2")
-# p
+p
 ```
 
+## Test
 
-```{r __Shafiro test}
+```{r tests 4}
 data <- practica_4
 colnames(data) <- c("Mostra", "Contingut", "Mitjana", "Error")
 
+# Comporvam normalitat
 shapiro.test(data$Contingut)
 
-one.way <- aov(data$Contingut ~ data$Mostra)
-summary(one.way)
+# Si es normal: Anova
+summary(aov(data$Contingut ~ data$Mostra))
 
-pwc <- pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
-pwc
+# Si es normal: t.test
+pairwise.t.test(data$Contingut, data$Mostra, paired = FALSE,  p.adjust.method = "bonferroni")
 
-kt <- kruskal.test(data$Contingut ~ data$Mostra)
-kt
+# Si no es normal: Kruskal test
+kruskal.test(data$Contingut ~ data$Mostra)
 
-pwc2 <- pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
-pwc2
+# Si no es normal: Wilcoxon test
+pairwise.wilcox.test(data$Contingut, data$Mostra, paired = FALSE, p.adjust.method = "holm")
 ```
