@@ -1,11 +1,10 @@
 ---
-title: "Treball aliments"
-author: "JV"
-date: "29/12/2022"
-output:
-  html_document:
-    toc: TRUE
+title: "Treball aliments (Quarto)"
+author: "Joan Vicenç"
+format: html
+editor: visual
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -14,6 +13,7 @@ directori <- getwd()
 
 library(readxl)
 library(tidyverse)
+
 
 
 # lectura de dades:
