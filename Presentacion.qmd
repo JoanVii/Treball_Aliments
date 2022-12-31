@@ -2,25 +2,44 @@
 title: "Presentación: Fundamentos de Git y GitHub"
 author: "Joan Vicenç Cladera Salvà"
 format: html
+  toc: TRUE
 editor: visual
 ---
 
 ## Repositorio
 
-El repositorio donde está el código de esta tarea para la obtención del certificado de aprovechamiento del curso "Fundamentos de Git y GitHub y su aplicación en proyectos colaborativos y reproducibles en R y RStudio" es:
+El repositorio donde está alojado el código es de [github.com](https://github.com/JoanVii/Treball_Aliments).
 
-"[github.com](https://github.com/JoanVii/Treball_Aliments)"
+![](images/image-1893984673.png)
+
+Concretament: <https://github.com/JoanVii/Treball_Aliments>
 
 ### Readme
 
+El documento README está en formato .md y se puede leer en el repostorio.
+
+![](images/image-1695848525.png)
+
 ### Issue
+
+A modo de "issue" he comentado que faltan funciones para facilitar el flujo de trabajo.
+
+![](images/image-455188121.png)
 
 ### Participantes
 
+Desafortunadament, he hecho este proyecto solo así que no salen los colaboradores. Si hubiera saldrian debajo de los "Packages".
+
+![](images/image-1653245240.png)
+
 ## Historial de commits
+
+El historial de comits de la rama principal és:
+
+![](images/image-1180041855.png)
 
 ## Documentos de Quarto
 
-## Word
+### Word
 
 ## Organización y problemas
