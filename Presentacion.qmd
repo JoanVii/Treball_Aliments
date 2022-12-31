@@ -1,0 +1,50 @@
+---
+title: "Presentación: Fundamentos de Git y GitHub"
+author: "Joan Vicenç Cladera Salvà"
+format: html
+editor: visual
+---
+
+## Repositorio
+
+El repositorio donde está alojado el código es de [github.com](https://github.com/JoanVii/Treball_Aliments).
+
+![](images/image-1893984673.png)
+
+Concretamente: <https://github.com/JoanVii/Treball_Aliments>
+
+### Readme
+
+El documento README está en formato .md y se puede leer en el repositorio.
+
+![](images/image-1695848525.png)
+
+### Issue
+
+A modo de "issue" he comentado que faltan funciones para facilitar el flujo de trabajo.
+
+![](images/image-455188121.png)
+
+### Participantes
+
+Desafortunadamente, he hecho este proyecto solo así que no salen los colaboradores. Si hubiera saldrían debajo de los "Packages".
+
+![](images/image-1653245240.png)
+
+## Historial de commits
+
+El historial de commits de la rama principal es:
+
+![](images/image-1180041855.png)
+
+## Documentos de Quarto
+
+![](images/image-1912590813.png)
+
+### Word
+
+![](images/image-1996484594.png)
+
+## Organización y problemas
+
+He hecho el trabajo solo y git me está siendo de gran ayuda para tener más orden en mis proyectos y evitar archivos repetidos como "copias seguras". Aunque no conozco los problemas de organización, supongo que es importate la comunicación, ósea, que cada uno haga lo que le toque y no modifique el código de los otros. Y estar continuamente haciendo push y pull para evitar quedar desfasado del proyecto "main".
